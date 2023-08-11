@@ -19,7 +19,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 np.random.seed(1234)
-tf.set_random_seed(1234)
+tf.compat.v1.set_random_seed(1234)
 
 
 class PhysicsInformedNN:
@@ -53,20 +53,20 @@ class PhysicsInformedNN:
         self.weights, self.biases = self.initialize_NN(layers)
         
         # tf Placeholders        
-        self.x0_tf = tf.placeholder(tf.float32, shape=[None, self.x0.shape[1]])
-        self.t0_tf = tf.placeholder(tf.float32, shape=[None, self.t0.shape[1]])
+        self.x0_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.x0.shape[1]])
+        self.t0_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.t0.shape[1]])
         
-        self.u0_tf = tf.placeholder(tf.float32, shape=[None, self.u0.shape[1]])
-        self.v0_tf = tf.placeholder(tf.float32, shape=[None, self.v0.shape[1]])
+        self.u0_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.u0.shape[1]])
+        self.v0_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.v0.shape[1]])
         
-        self.x_lb_tf = tf.placeholder(tf.float32, shape=[None, self.x_lb.shape[1]])
-        self.t_lb_tf = tf.placeholder(tf.float32, shape=[None, self.t_lb.shape[1]])
+        self.x_lb_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.x_lb.shape[1]])
+        self.t_lb_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.t_lb.shape[1]])
         
-        self.x_ub_tf = tf.placeholder(tf.float32, shape=[None, self.x_ub.shape[1]])
-        self.t_ub_tf = tf.placeholder(tf.float32, shape=[None, self.t_ub.shape[1]])
+        self.x_ub_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.x_ub.shape[1]])
+        self.t_ub_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.t_ub.shape[1]])
         
-        self.x_f_tf = tf.placeholder(tf.float32, shape=[None, self.x_f.shape[1]])
-        self.t_f_tf = tf.placeholder(tf.float32, shape=[None, self.t_f.shape[1]])
+        self.x_f_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.x_f.shape[1]])
+        self.t_f_tf = tf.compat.v1.placeholder(tf.float32, shape=[None, self.t_f.shape[1]])
 
         # tf Graphs
         self.u0_pred, self.v0_pred, _ , _ = self.net_uv(self.x0_tf, self.t0_tf)
@@ -93,14 +93,14 @@ class PhysicsInformedNN:
                                                                            'maxls': 50,
                                                                            'ftol' : 1.0 * np.finfo(float).eps})
     
-        self.optimizer_Adam = tf.train.AdamOptimizer()
+        self.optimizer_Adam = tf.compat.v1.train.AdamOptimizer()
         self.train_op_Adam = self.optimizer_Adam.minimize(self.loss)
                 
         # tf session
-        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True,
+        self.sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=True,
                                                      log_device_placement=True))
         
-        init = tf.global_variables_initializer()
+        init = tf.compat.v1.global_variables_initializer()
         self.sess.run(init)
               
     def initialize_NN(self, layers):        
@@ -118,7 +118,7 @@ class PhysicsInformedNN:
         in_dim = size[0]
         out_dim = size[1]        
         xavier_stddev = np.sqrt(2/(in_dim + out_dim))
-        return tf.Variable(tf.truncated_normal([in_dim, out_dim], stddev=xavier_stddev), dtype=tf.float32)
+        return tf.Variable(tf.random.truncated_normal([in_dim, out_dim], stddev=xavier_stddev), dtype=tf.float32)
     
     def neural_net(self, X, weights, biases):
         num_layers = len(weights) + 1
