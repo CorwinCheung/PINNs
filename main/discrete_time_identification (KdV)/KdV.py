@@ -16,7 +16,7 @@ import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 np.random.seed(1234)
-tf.set_random_seed(1234)
+tf.compat.v1.set_random_seed(1234)
 
 
 class PhysicsInformedNN:
@@ -51,15 +51,15 @@ class PhysicsInformedNN:
         self.IRK_times = tmp[q**2+q:]
         
         # tf placeholders and graph
-        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True,
+        self.sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(allow_soft_placement=True,
                                                      log_device_placement=True))
         
-        self.x0_tf = tf.placeholder(tf.float32, shape=(None, self.x0.shape[1]))
-        self.x1_tf = tf.placeholder(tf.float32, shape=(None, self.x1.shape[1]))
-        self.u0_tf = tf.placeholder(tf.float32, shape=(None, self.u0.shape[1]))
-        self.u1_tf = tf.placeholder(tf.float32, shape=(None, self.u1.shape[1]))
-        self.dummy_x0_tf = tf.placeholder(tf.float32, shape=(None, self.q)) # dummy variable for fwd_gradients        
-        self.dummy_x1_tf = tf.placeholder(tf.float32, shape=(None, self.q)) # dummy variable for fwd_gradients        
+        self.x0_tf = tf.compat.v1.placeholder(tf.float32, shape=(None, self.x0.shape[1]))
+        self.x1_tf = tf.compat.v1.placeholder(tf.float32, shape=(None, self.x1.shape[1]))
+        self.u0_tf = tf.compat.v1.placeholder(tf.float32, shape=(None, self.u0.shape[1]))
+        self.u1_tf = tf.compat.v1.placeholder(tf.float32, shape=(None, self.u1.shape[1]))
+        self.dummy_x0_tf = tf.compat.v1.placeholder(tf.float32, shape=(None, self.q)) # dummy variable for fwd_gradients        
+        self.dummy_x1_tf = tf.compat.v1.placeholder(tf.float32, shape=(None, self.q)) # dummy variable for fwd_gradients        
         
         self.U0_pred = self.net_U0(self.x0_tf) # N0 x q
         self.U1_pred = self.net_U1(self.x1_tf) # N1 x q
@@ -75,10 +75,10 @@ class PhysicsInformedNN:
                                                                            'maxls': 50,
                                                                            'ftol' : 1.0 * np.finfo(float).eps})        
         
-        self.optimizer_Adam = tf.train.AdamOptimizer()
+        self.optimizer_Adam = tf.compat.v1.train.AdamOptimizer()
         self.train_op_Adam = self.optimizer_Adam.minimize(self.loss)
         
-        init = tf.global_variables_initializer()
+        init = tf.compat.v1.global_variables_initializer()
         self.sess.run(init)
         
     def initialize_NN(self, layers):        
@@ -96,7 +96,7 @@ class PhysicsInformedNN:
         in_dim = size[0]
         out_dim = size[1]        
         xavier_stddev = np.sqrt(2/(in_dim + out_dim))
-        return tf.Variable(tf.truncated_normal([in_dim, out_dim], stddev=xavier_stddev), dtype=tf.float32)
+        return tf.Variable(tf.random.truncated_normal([in_dim, out_dim], stddev=xavier_stddev), dtype=tf.float32)
     
     def neural_net(self, X, weights, biases):
         num_layers = len(weights) + 1
